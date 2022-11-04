@@ -31,6 +31,19 @@ public class PlayerTank : BaseTank, IMoney
         }
     }
 
+    public float DefencePower
+    {
+        get => defencePower;
+        set
+        {
+            if(value != defencePower)
+            {
+                defencePower = value;
+                onDefenceChange?.Invoke(defencePower);
+            }
+        }
+    }
+
     public int money = 3;
 
     public int Money
@@ -51,9 +64,11 @@ public class PlayerTank : BaseTank, IMoney
         }
     }
 
+    // IMoney
     public Action<float> onMoneyChange { get; set; }
     public Action<float> onDamageChange { get; set; }
-
+    public Action<float> onDefenceChange { get; set; }
+    //--------------------------------------------------------------
     public static Action siegeTankMode;
     public static Action normalTankMode;
  

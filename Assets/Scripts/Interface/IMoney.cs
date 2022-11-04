@@ -7,5 +7,6 @@ public interface IMoney
 {
     Action<float> onMoneyChange { get; set; }
     Action<float> onDamageChange { get; set; }
+    Action<float> onDefenceChange { get; set; }
 }
 

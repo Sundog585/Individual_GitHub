@@ -10,11 +10,13 @@ using UnityEngine.UI;
 public class StoreManager : MonoBehaviour
 {
     public Button attackUpgradeButton;
+    //TextMeshProUGUI attackValue;
     public Button closeButton;
     public TextMeshProUGUI moneyNotEnough;
     public TextMeshProUGUI moneyText;
 
     int attackUpgradePrice = 1;
+    int defenceUpgradePrice = 1;
     int attackUpgradeDamage = 10;
 
 
@@ -26,7 +28,8 @@ public class StoreManager : MonoBehaviour
 
     private void Start()
     {
-        attackUpgradeButton = GetComponent<Button>();      
+        attackUpgradeButton = GetComponent<Button>();
+        //attackValue = attackUpgradeButton.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
         player = GameManager.Instance.Player.GetComponent<PlayerTank>();
         shell = GameManager.Instance.Shell.GetComponent<Shell>();
         moneyNotEnough.color = new Color(moneyNotEnough.color.r, moneyNotEnough.color.g, moneyNotEnough.color.b, 0);
@@ -45,11 +48,27 @@ public class StoreManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("성공");
             StartCoroutine(FadeTextToFullAlpha());
         }
 
         
+        Debug.Log(shell.Data.damage);
+    }
+
+    public void OnClickDefenceUpgrade()
+    {
+        if (player.money != 0)
+        {
+            player.Money -= attackUpgradePrice;
+            player.defencePower += defenceUpgradePrice;
+            // 강화 금액 점점 증가하게 할지 고민해보기
+        }
+        else
+        {
+            StartCoroutine(FadeTextToFullAlpha());
+        }
+
+
         Debug.Log(shell.Data.damage);
     }
 
@@ -73,8 +92,8 @@ public class StoreManager : MonoBehaviour
             yield return null;
         }
     }
-        public void OnClickClose()
-        {
-            this.gameObject.SetActive(false);
-        }
+    public void OnClickClose()
+    {
+        this.gameObject.SetActive(false);
+    }
 }
