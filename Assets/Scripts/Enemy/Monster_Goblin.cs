@@ -24,6 +24,7 @@ public class Monster_Goblin : MonoBehaviour, IHit
     public float maxHP = 100.0f;
     public float hp;
     public Vector3 hitPoint = Vector3.zero; // 충돌 위치
+    protected int dropMoney = 5;
     
     public float HP
     {
@@ -54,8 +55,9 @@ public class Monster_Goblin : MonoBehaviour, IHit
     public float attackSpeed = 1.0f;
     public float attackCoolTime = 3.0f;
 
-    protected GameObject Player;
+    protected GameObject player;
     public Transform target;
+    protected PlayerTank playerTank;
 
     public float AttackPower { get => attackPower; }
     public float DefencePower { get => defencePower; }
@@ -73,8 +75,9 @@ public class Monster_Goblin : MonoBehaviour, IHit
     protected virtual void Start()
     {
         // 나중에 아군 탱크 어떻게 쫒을건지 생각해 보기
-        Player = GameObject.FindGameObjectWithTag("Player");
-        target = Player.transform;
+        player = GameManager.Instance.Player;
+        target = player.transform;
+        playerTank = player.GetComponent<PlayerTank>();
         state = MonsterState.Idle;
     }
 
@@ -242,6 +245,7 @@ public class Monster_Goblin : MonoBehaviour, IHit
         }
         else
         {
+            playerTank.Money += dropMoney;
             Die();
         }
     }
@@ -250,7 +254,7 @@ public class Monster_Goblin : MonoBehaviour, IHit
     {
         if (!isDead)
         {
-            ChangeState(MonsterState.Dead);
+            ChangeState(MonsterState.Dead);          
         }
     }
 }
