@@ -110,6 +110,7 @@ public class PlayerTank : BaseTank, IMoney
     {
         rigid.AddForce(inputDir.y * moveSpeed * transform.forward); // 전진 후진
         rigid.AddTorque(inputDir.x * turnSpeed * transform.up);     // 좌회전 우회전
+        //transform.Translate(inputDir * moveSpeed * Time.fixedDeltaTime, Space.Self);
     }
 
     protected override void Update()
@@ -122,7 +123,9 @@ public class PlayerTank : BaseTank, IMoney
     {
         inputActions.Player.Enable();
         inputActions.Player.Move.performed += OnMove;
+        inputActions.Player.Move.canceled += OnMove;
         inputActions.Player.Look.performed += OnMouseMove;
+        inputActions.Player.Look.canceled += OnMouseMove;
         inputActions.Player.NormalFire.performed += OnNormalFire;
     }
 
@@ -130,7 +133,9 @@ public class PlayerTank : BaseTank, IMoney
     private void OnDisable()
     {
         inputActions.Player.NormalFire.performed -= OnNormalFire;
+        inputActions.Player.Look.canceled -= OnMouseMove;
         inputActions.Player.Look.performed -= OnMouseMove;
+        inputActions.Player.Move.canceled -= OnMove;
         inputActions.Player.Move.performed -= OnMove;
         inputActions.Player.Disable();
     }

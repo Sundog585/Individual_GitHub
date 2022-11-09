@@ -50,6 +50,7 @@ public class CameraManager : MonoBehaviour
     private void Start()
     {
         PostProcessVolume.profile.TryGet<Vignette>(out vignette);
+        aim.enabled = false;
         zoomMode = false;
         mainCamera.enabled = true;
         zoomCamera.enabled = false;
