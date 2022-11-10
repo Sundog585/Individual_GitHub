@@ -31,6 +31,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "StoreOpen",
+                    "type": "Button",
+                    "id": "46255b56-6378-477d-9f18-05dd3cc9e1ac",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -91,23 +100,34 @@
                 },
                 {
                     "name": "",
-                    "id": "8c56e729-2ece-44a3-a405-a6fc042c4519",
-                    "path": "<Mouse>/position",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Look",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "2a896428-674e-42c2-8458-3960bb6109f9",
                     "path": "<Mouse>/leftButton",
                     "interactions": "",
                     "processors": "",
                     "groups": "K&M",
                     "action": "NormalFire",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9a62cf9c-0269-470d-8363-75469d98ee0e",
+                    "path": "<Mouse>/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "K&M",
+                    "action": "Look",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0c596c90-5dde-4669-93d6-0d371347341e",
+                    "path": "<Keyboard>/i",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "K&M",
+                    "action": "StoreOpen",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

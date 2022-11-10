@@ -10,6 +10,7 @@ public class PlayerUI : MonoBehaviour,IMoney
 {
     TextMeshProUGUI attackDamage;
     TextMeshProUGUI defenceValue;
+    TextMeshProUGUI moneyNotEnough;
     Shell shell;
     PlayerTank player;
 
@@ -22,6 +23,7 @@ public class PlayerUI : MonoBehaviour,IMoney
 
         attackDamage = transform.Find("ShellDamage").transform.GetChild(0).GetComponent<TextMeshProUGUI>();
         defenceValue = transform.Find("DefenceValue").transform.GetChild(0).GetComponent<TextMeshProUGUI>();
+        moneyNotEnough = transform.Find("MoneyEmpty").GetComponent<TextMeshProUGUI>();
         //shell = GameManager.Instance.Shell.GetComponent<Shell>();
     }
 
@@ -29,6 +31,7 @@ public class PlayerUI : MonoBehaviour,IMoney
     {       
         player = GameManager.Instance.Player.GetComponent<PlayerTank>();
         shell = GameManager.Instance.Shell.GetComponent<Shell>();
+        moneyNotEnough.color = new Color(moneyNotEnough.color.r, moneyNotEnough.color.g, moneyNotEnough.color.b, 0);
     }
 
     private void Update()
@@ -54,5 +57,31 @@ public class PlayerUI : MonoBehaviour,IMoney
         {
             attackDamage.text = $"Shell Damge : {defence}";
         };
+    }
+
+    public void MoneyNotEnough()
+    {
+        StartCoroutine(FadeTextToFullAlpha());
+    }
+
+    public IEnumerator FadeTextToFullAlpha() // 알파값 0에서 1로 전환
+    {
+        moneyNotEnough.color = new Color(moneyNotEnough.color.r, moneyNotEnough.color.g, moneyNotEnough.color.b, 0);
+        while (moneyNotEnough.color.a < 1.0f)
+        {
+            moneyNotEnough.color = new Color(moneyNotEnough.color.r, moneyNotEnough.color.g, moneyNotEnough.color.b, moneyNotEnough.color.a + (Time.deltaTime / 2.0f));
+            yield return null;
+        }
+        StartCoroutine(FadeTextToZero());
+    }
+
+    public IEnumerator FadeTextToZero()  // 알파값 1에서 0으로 전환
+    {
+        moneyNotEnough.color = new Color(moneyNotEnough.color.r, moneyNotEnough.color.g, moneyNotEnough.color.b, 1);
+        while (moneyNotEnough.color.a > 0.0f)
+        {
+            moneyNotEnough.color = new Color(moneyNotEnough.color.r, moneyNotEnough.color.g, moneyNotEnough.color.b, moneyNotEnough.color.a - (Time.deltaTime / 2.0f));
+            yield return null;
+        }
     }
 }

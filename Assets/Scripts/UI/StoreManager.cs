@@ -10,9 +10,7 @@ using UnityEngine.UI;
 public class StoreManager : MonoBehaviour
 {
     public Button attackUpgradeButton;
-    //TextMeshProUGUI attackValue;
     public Button closeButton;
-    public TextMeshProUGUI moneyNotEnough;
     public TextMeshProUGUI moneyText;
 
     int attackUpgradePrice = 1;
@@ -22,6 +20,7 @@ public class StoreManager : MonoBehaviour
 
 
     PlayerTank player;
+    PlayerUI playerUI;
     Shell shell;
 
     public Action<float> onMoneyChange { get => ((IMoney)player).onMoneyChange; set => ((IMoney)player).onMoneyChange = value; }
@@ -29,10 +28,9 @@ public class StoreManager : MonoBehaviour
     private void Start()
     {
         attackUpgradeButton = GetComponent<Button>();
-        //attackValue = attackUpgradeButton.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
+        playerUI = GameManager.Instance.PlayerUI.GetComponent<PlayerUI>();
         player = GameManager.Instance.Player.GetComponent<PlayerTank>();
         shell = GameManager.Instance.Shell.GetComponent<Shell>();
-        moneyNotEnough.color = new Color(moneyNotEnough.color.r, moneyNotEnough.color.g, moneyNotEnough.color.b, 0);
         moneyText.text = $"{player.money}";
         onMoneyChange += (money) =>
         {
@@ -48,7 +46,7 @@ public class StoreManager : MonoBehaviour
         }
         else
         {
-            StartCoroutine(FadeTextToFullAlpha());
+            playerUI.MoneyNotEnough();
         }
 
         
@@ -65,35 +63,20 @@ public class StoreManager : MonoBehaviour
         }
         else
         {
-            StartCoroutine(FadeTextToFullAlpha());
+            playerUI.MoneyNotEnough();
         }
 
 
         Debug.Log(shell.Data.damage);
     }
 
-    public IEnumerator FadeTextToFullAlpha() // 알파값 0에서 1로 전환
-    {
-        moneyNotEnough.color = new Color(moneyNotEnough.color.r, moneyNotEnough.color.g, moneyNotEnough.color.b, 0);
-        while (moneyNotEnough.color.a < 1.0f)
-        {
-            moneyNotEnough.color = new Color(moneyNotEnough.color.r, moneyNotEnough.color.g, moneyNotEnough.color.b, moneyNotEnough.color.a + (Time.deltaTime / 2.0f));
-            yield return null;
-        }
-        StartCoroutine(FadeTextToZero());
-    }
-
-    public IEnumerator FadeTextToZero()  // 알파값 1에서 0으로 전환
-    {
-        moneyNotEnough.color = new Color(moneyNotEnough.color.r, moneyNotEnough.color.g, moneyNotEnough.color.b, 1);
-        while (moneyNotEnough.color.a > 0.0f)
-        {
-            moneyNotEnough.color = new Color(moneyNotEnough.color.r, moneyNotEnough.color.g, moneyNotEnough.color.b, moneyNotEnough.color.a - (Time.deltaTime / 2.0f));
-            yield return null;
-        }
-    }
     public void OnClickClose()
     {
         this.gameObject.SetActive(false);
+    }
+
+    public void OpenStore()
+    {
+        this.gameObject.SetActive(true);
     }
 }

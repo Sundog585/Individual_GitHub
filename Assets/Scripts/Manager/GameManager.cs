@@ -19,6 +19,13 @@ public class GameManager : MonoBehaviour
     {
         get { return player; }
     }
+
+    GameObject playerUI;
+    public GameObject PlayerUI
+    {
+        get { return playerUI; }
+    }
+
     public GameObject Shell
     {
         get { return shell[0]; }
@@ -27,6 +34,12 @@ public class GameManager : MonoBehaviour
     public GameObject Shell_Siege
     {
         get { return shell[1]; }
+    }
+
+    GameObject store;
+    public GameObject Store
+    {
+        get { return store; }
     }
 
     private void Awake()
@@ -52,5 +65,7 @@ public class GameManager : MonoBehaviour
     {
         Cursor.visible = false;
         player = GameObject.FindGameObjectWithTag("Player");
+        store = GameObject.FindGameObjectWithTag("Store");
+        playerUI = player.transform.GetChild(1).gameObject;
     }
 }

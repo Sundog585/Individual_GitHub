@@ -53,6 +53,15 @@ public partial class @PlayerInputSystem : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""StoreOpen"",
+                    ""type"": ""Button"",
+                    ""id"": ""46255b56-6378-477d-9f18-05dd3cc9e1ac"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -113,23 +122,34 @@ public partial class @PlayerInputSystem : IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""8c56e729-2ece-44a3-a405-a6fc042c4519"",
-                    ""path"": ""<Mouse>/position"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Look"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
                     ""id"": ""2a896428-674e-42c2-8458-3960bb6109f9"",
                     ""path"": ""<Mouse>/leftButton"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""K&M"",
                     ""action"": ""NormalFire"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9a62cf9c-0269-470d-8363-75469d98ee0e"",
+                    ""path"": ""<Mouse>/position"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""K&M"",
+                    ""action"": ""Look"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0c596c90-5dde-4669-93d6-0d371347341e"",
+                    ""path"": ""<Keyboard>/i"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""K&M"",
+                    ""action"": ""StoreOpen"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -188,6 +208,7 @@ public partial class @PlayerInputSystem : IInputActionCollection2, IDisposable
         m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
         m_Player_Look = m_Player.FindAction("Look", throwIfNotFound: true);
         m_Player_NormalFire = m_Player.FindAction("NormalFire", throwIfNotFound: true);
+        m_Player_StoreOpen = m_Player.FindAction("StoreOpen", throwIfNotFound: true);
         // Camera
         m_Camera = asset.FindActionMap("Camera", throwIfNotFound: true);
         m_Camera_ZoomInOut = m_Camera.FindAction("ZoomInOut", throwIfNotFound: true);
@@ -253,6 +274,7 @@ public partial class @PlayerInputSystem : IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Move;
     private readonly InputAction m_Player_Look;
     private readonly InputAction m_Player_NormalFire;
+    private readonly InputAction m_Player_StoreOpen;
     public struct PlayerActions
     {
         private @PlayerInputSystem m_Wrapper;
@@ -260,6 +282,7 @@ public partial class @PlayerInputSystem : IInputActionCollection2, IDisposable
         public InputAction @Move => m_Wrapper.m_Player_Move;
         public InputAction @Look => m_Wrapper.m_Player_Look;
         public InputAction @NormalFire => m_Wrapper.m_Player_NormalFire;
+        public InputAction @StoreOpen => m_Wrapper.m_Player_StoreOpen;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -278,6 +301,9 @@ public partial class @PlayerInputSystem : IInputActionCollection2, IDisposable
                 @NormalFire.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnNormalFire;
                 @NormalFire.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnNormalFire;
                 @NormalFire.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnNormalFire;
+                @StoreOpen.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnStoreOpen;
+                @StoreOpen.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnStoreOpen;
+                @StoreOpen.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnStoreOpen;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -291,6 +317,9 @@ public partial class @PlayerInputSystem : IInputActionCollection2, IDisposable
                 @NormalFire.started += instance.OnNormalFire;
                 @NormalFire.performed += instance.OnNormalFire;
                 @NormalFire.canceled += instance.OnNormalFire;
+                @StoreOpen.started += instance.OnStoreOpen;
+                @StoreOpen.performed += instance.OnStoreOpen;
+                @StoreOpen.canceled += instance.OnStoreOpen;
             }
         }
     }
@@ -342,6 +371,7 @@ public partial class @PlayerInputSystem : IInputActionCollection2, IDisposable
         void OnMove(InputAction.CallbackContext context);
         void OnLook(InputAction.CallbackContext context);
         void OnNormalFire(InputAction.CallbackContext context);
+        void OnStoreOpen(InputAction.CallbackContext context);
     }
     public interface ICameraActions
     {

@@ -44,6 +44,8 @@ public class PlayerTank : BaseTank, IMoney
         }
     }
 
+    public bool StoreOn { get; set; }
+
     public int money = 3;
 
     public int Money
@@ -83,6 +85,7 @@ public class PlayerTank : BaseTank, IMoney
     public bool zoomMode;
 
     Slider HpBar;
+    StoreManager store;
 
     Quaternion turretTargetRotation = Quaternion.identity;
 
@@ -104,6 +107,7 @@ public class PlayerTank : BaseTank, IMoney
     protected override void Start()
     {
         base.Start();
+        store = GameManager.Instance.Store.GetComponent<StoreManager>();
     }
 
     private void FixedUpdate()
@@ -127,6 +131,7 @@ public class PlayerTank : BaseTank, IMoney
         inputActions.Player.Look.performed += OnMouseMove;
         inputActions.Player.Look.canceled += OnMouseMove;
         inputActions.Player.NormalFire.performed += OnNormalFire;
+        inputActions.Player.StoreOpen.performed += OnStoreOpen;
     }
 
 
@@ -156,7 +161,6 @@ public class PlayerTank : BaseTank, IMoney
 
     private void OnMouseMove(InputAction.CallbackContext context)
     {
-        
         Vector2 screenPos = context.ReadValue<Vector2>();
         Ray ray = Camera.main.ScreenPointToRay(screenPos);
         if (Physics.Raycast(ray, out RaycastHit Hit, 1000.0f, LayerMask.GetMask("Ground")))
@@ -169,6 +173,21 @@ public class PlayerTank : BaseTank, IMoney
             lookDir.y = 0.0f;               // y 제거
             lookDir = lookDir.normalized;   // 노멀라이즈.
             turretTargetRotation = Quaternion.LookRotation(lookDir);    // 최종적으로 포탑이 해야할 회전 계산
+        }
+        //Vector2 pos = context.ReadValue<Vector2>();
+
+    }
+    private void OnStoreOpen(InputAction.CallbackContext context)
+    {
+        if (StoreOn)
+        {
+            StoreOn = false;
+            store.OpenStore();
+        }
+        else
+        {
+            StoreOn = true;
+            store.OnClickClose();
         }
     }
 
