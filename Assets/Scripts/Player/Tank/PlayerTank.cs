@@ -42,6 +42,7 @@ public class PlayerTank : BaseTank, IMoney
                 onDefenceChange?.Invoke(defencePower);
             }
         }
+        
     }
 
     public bool StoreOn { get; set; }
