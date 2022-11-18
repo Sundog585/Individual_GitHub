@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -16,6 +17,9 @@ public class Test_Seamless : MonoBehaviour
         string sceneNameBase = "TestSeamless";
         asyncs = new AsyncOperation[Height, Width];
 
+        asyncs[1, 1] = SceneManager.LoadSceneAsync($"{sceneNameBase}_1_1", LoadSceneMode.Additive);
+        asyncs[1, 1].completed += (AsyncOperation _) => Debug.Log($"{sceneNameBase}_1_1");
+        asyncs[1, 1].priority = 5;
         for (int y = 0; y < Height; y++)
         {
             for (int x = 0; x < Width; x++)
@@ -24,7 +28,11 @@ public class Test_Seamless : MonoBehaviour
                 //SceneManager.LoadScene($"{sceneNameBase}_{x}_{y}", LoadSceneMode.Additive);
 
                 // 비동기 방식 로딩..
-                asyncs[y,x] = SceneManager.LoadSceneAsync($"{sceneNameBase}_{x}_{y}", LoadSceneMode.Additive);
+                asyncs[y, x] = SceneManager.LoadSceneAsync($"{sceneNameBase}_{x}_{y}", LoadSceneMode.Additive);
+                if (y == 1 && x == 1)
+                {
+                    continue;
+                }
                 
                 // 델리게이트에 전달되는 변수는 힙으로 옮겨진다.
                 int tempX = x;
@@ -37,6 +45,6 @@ public class Test_Seamless : MonoBehaviour
             }
         }
 
-        asyncs[0, 0].allowSceneActivation = false;    
+        //asyncs[0, 0].allowSceneActivation = false;    
     }
 }

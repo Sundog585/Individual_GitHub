@@ -160,6 +160,34 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "UI",
+            "id": "3aa60ecf-6b52-4f18-adde-01754b5f6608",
+            "actions": [
+                {
+                    "name": "Press",
+                    "type": "Button",
+                    "id": "a07d5694-4fdc-4336-8b8d-c69f5c1f9595",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "a2a584cb-3213-4da3-b66d-954929eff64c",
+                    "path": "<Mouse>/press",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "K&M",
+                    "action": "Press",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": [
