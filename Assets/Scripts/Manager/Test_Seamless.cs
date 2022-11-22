@@ -11,11 +11,26 @@ public class Test_Seamless : MonoBehaviour
     private const int Width = 3;
 
     AsyncOperation[,] asyncs;
+    string[,] sceneNames;
+    bool[,] sceneLoaded;    // true면 로딩 되었음. false면 되지 않음
+
 
     private void Start()
     {
-        string sceneNameBase = "TestSeamless";
+        for (int i = 0; i < 3; i++)
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                GameManager.Instance.MapManager.RequestAsyncSceneLoad(i, j);
+            }
+        }
+    }
+
+    private void Test_Code()
+    {
+        string sceneNameBase = "Seamless";
         asyncs = new AsyncOperation[Height, Width];
+        sceneNames = new string[Height, Width];
 
         asyncs[1, 1] = SceneManager.LoadSceneAsync($"{sceneNameBase}_1_1", LoadSceneMode.Additive);
         asyncs[1, 1].completed += (AsyncOperation _) => Debug.Log($"{sceneNameBase}_1_1");
@@ -26,18 +41,22 @@ public class Test_Seamless : MonoBehaviour
             {
                 // 동기(Synchronous) 방식 로딩. 로딩중 다른 작업은 할 수 없음.
                 //SceneManager.LoadScene($"{sceneNameBase}_{x}_{y}", LoadSceneMode.Additive);
+                string temp = $"{sceneNameBase}_{x}_{y}";
+                sceneNames[y, x] = temp;
 
-                // 비동기 방식 로딩..
-                asyncs[y, x] = SceneManager.LoadSceneAsync($"{sceneNameBase}_{x}_{y}", LoadSceneMode.Additive);
                 if (y == 1 && x == 1)
                 {
                     continue;
                 }
-                
+
+                // 비동기 방식 로딩..
+                asyncs[y, x] = SceneManager.LoadSceneAsync(temp, LoadSceneMode.Additive);
+
                 // 델리게이트에 전달되는 변수는 힙으로 옮겨진다.
                 int tempX = x;
                 int tempY = y;
                 asyncs[y, x].completed += (AsyncOperation _) => Debug.Log($"{sceneNameBase}_{tempX}_{tempY}");
+                asyncs[y, x].completed += (_) => sceneLoaded[tempY, tempX] = true;
 
                 // allowSceneActivation = false를 중첩으로 하는 것은 절대로 하면 안됨
                 //asyncs[y, x].allowSceneActivation = false;    
@@ -46,5 +65,17 @@ public class Test_Seamless : MonoBehaviour
         }
 
         //asyncs[0, 0].allowSceneActivation = false;    
+    }
+
+    private void Update()
+    {
+        if (Keyboard.current.digit1Key.wasPressedThisFrame)
+        {
+            GameManager.Instance.MapManager.RequestAsyncSceneLoad(1, 0);
+        }
+        if (Keyboard.current.digit2Key.wasPressedThisFrame)
+        {
+            GameManager.Instance.MapManager.RequestAsyncSceneUnload(1, 0);
+        }
     }
 }

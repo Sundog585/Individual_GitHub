@@ -7,6 +7,12 @@ public class GameManager : MonoBehaviour
 {
     private static GameManager instance;
 
+    /// <summary>
+    /// 심리스용
+    /// </summary>
+    MapManager mapManager;
+    public MapManager MapManager => mapManager;
+
     public static GameManager Instance
     {
         get { return instance; }
@@ -63,9 +69,14 @@ public class GameManager : MonoBehaviour
     }
     private void Initialize()
     {
+        if(mapManager == null)
+        {
+            mapManager = GetComponent<MapManager>();
+        }
         Cursor.visible = false;
         player = GameObject.FindGameObjectWithTag("Player");
         store = GameObject.FindGameObjectWithTag("Store");
-        playerUI = player.transform.GetChild(1).gameObject;
+        playerUI = player.transform.GetChild(1).gameObject; // 잠시 지워놓은것
+        mapManager.Initialize();
     }
 }
