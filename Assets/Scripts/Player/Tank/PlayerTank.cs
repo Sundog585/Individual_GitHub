@@ -92,9 +92,31 @@ public class PlayerTank : BaseTank, IMoney
 
     Vector2 inputDir = Vector2.zero;
 
+    // 플레이어 위치
+
+    Vector3 dir;
+    Vector3 oldDir = Vector3.down;
+
+    Vector3Int currentMap = Vector3Int.one;     // 플레이어가 존재하는 맵의 번호
+    Vector3 mapSize = new Vector3(100, 0,100);      // 맵 하나의 크기
+    Vector3Int mapCount = new Vector3Int(3, 0,3); //맵의 갯수(가로,세로)
+    Vector3 offset = Vector3.zero;
+    public Vector3Int CurrentMap
+    {
+        set
+        {
+            if(currentMap != value)
+            {
+                currentMap = value;
+                Debug.Log($"현재 맵의 위치 : {currentMap}");
+            }
+        }
+    }
+
     protected override void Awake()
     {
         base.Awake();
+
         HpBar = GetComponentInChildren<Slider>();
         onHealthChange += (ratio) =>
         {
@@ -103,6 +125,9 @@ public class PlayerTank : BaseTank, IMoney
         inputActions = new PlayerInputSystem();
         siegeTankMode = () => { SiegeTankMode(); };
         normalTankMode = () => { NormalMode(); };
+
+        // 월드 원점에서 맵이 얼마나 이동해 있는가? => offset으로 저장
+        offset = new Vector3(mapSize.x * mapCount.x * -0.5f,0, mapSize.z * mapCount.z * -0.5f);
     }
 
     protected override void Start()
@@ -116,6 +141,9 @@ public class PlayerTank : BaseTank, IMoney
         rigid.AddForce(inputDir.y * moveSpeed * transform.forward); // 전진 후진
         rigid.AddTorque(inputDir.x * turnSpeed * transform.up);     // 좌회전 우회전
         //transform.Translate(inputDir * moveSpeed * Time.fixedDeltaTime, Space.Self);
+
+        Vector3 pos = (Vector3)transform.position - offset; // 맵의 왼쪽 아래가 원점이라고 가정했을 때 나의 위치
+        CurrentMap = new Vector3Int((int)(pos.x / mapSize.x),0 ,(int)(pos.z / mapSize.z));    // 위치를 맵 하나의 크기로 나누어서 (,)맵인지 계산
     }
 
     protected override void Update()
