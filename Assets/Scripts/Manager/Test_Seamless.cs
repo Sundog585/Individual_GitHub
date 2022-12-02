@@ -17,13 +17,14 @@ public class Test_Seamless : MonoBehaviour
 
     private void Start()
     {
-        for (int i = 0; i < 3; i++)
-        {
-            for (int j = 0; j < 3; j++)
-            {
-                GameManager.Instance.MapManager.RequestAsyncSceneLoad(i, j);
-            }
-        }
+        //for (int i = 0; i < 3; i++)
+        //{
+        //    for (int j = 0; j < 3; j++)
+        //    {
+        //        GameManager.Instance.MapManager.RequestAsyncSceneLoad(i, j);
+        //    }
+        //}
+        //GameManager.Instance.Initialize();
     }
 
     private void Test_Code()
@@ -69,13 +70,13 @@ public class Test_Seamless : MonoBehaviour
 
     private void Update()
     {
-        if (Keyboard.current.digit1Key.wasPressedThisFrame)
-        {
-            GameManager.Instance.MapManager.RequestAsyncSceneLoad(1, 0);
-        }
-        if (Keyboard.current.digit2Key.wasPressedThisFrame)
-        {
-            GameManager.Instance.MapManager.RequestAsyncSceneUnload(1, 0);
-        }
+        //if (Keyboard.current.digit1Key.wasPressedThisFrame)
+        //{
+        //    GameManager.Instance.MapManager.RequestAsyncSceneLoad(1, 0);
+        //}
+        //if (Keyboard.current.digit2Key.wasPressedThisFrame)
+        //{
+        //    GameManager.Instance.MapManager.RequestAsyncSceneUnload(1, 0);
+        //}
     }
 }

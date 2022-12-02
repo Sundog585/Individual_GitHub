@@ -103,15 +103,18 @@ public class PlayerTank : BaseTank, IMoney
     Vector3 offset = Vector3.zero;
     public Vector3Int CurrentMap
     {
+        get => currentMap;
         set
         {
             if(currentMap != value)
             {
                 currentMap = value;
                 Debug.Log($"현재 맵의 위치 : {currentMap}");
+                onMapChange?.Invoke(currentMap);
             }
         }
     }
+    public Action<Vector3Int> onMapChange;
 
     protected override void Awake()
     {

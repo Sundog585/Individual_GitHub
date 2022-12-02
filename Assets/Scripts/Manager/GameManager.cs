@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 //using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -53,11 +54,8 @@ public class GameManager : MonoBehaviour
         if (instance == null)
         {
             instance = this;
-
-            //DontDestroyOnLoad(gameObject);
-            //SceneManager.sceneLoaded += OnSceneLoaded;
-            Initialize();
-
+            DontDestroyOnLoad(gameObject);
+            SceneManager.sceneLoaded += OnSceneLoaded;
         }
         else
         {
@@ -67,16 +65,23 @@ public class GameManager : MonoBehaviour
             }
         }
     }
-    private void Initialize()
+
+    private void OnSceneLoaded(Scene sceneData, LoadSceneMode mode)
     {
+        SceneManager.sceneLoaded -= OnSceneLoaded;  // 한번만 실행하기 위해
+        Initialize();
+    }
+
+    public void Initialize()
+    {
+        Cursor.visible = false;
+        player = GameObject.FindGameObjectWithTag("Player");    //mapManager의 초기화보다 앞에 있어야 한다.
+        store = GameObject.FindGameObjectWithTag("Store");
+        playerUI = player.transform.GetChild(1).gameObject; // 잠시 지워놓은것
         if(mapManager == null)
         {
             mapManager = GetComponent<MapManager>();
         }
-        Cursor.visible = false;
-        player = GameObject.FindGameObjectWithTag("Player");
-        store = GameObject.FindGameObjectWithTag("Store");
-        playerUI = player.transform.GetChild(1).gameObject; // 잠시 지워놓은것
         mapManager.Initialize();
     }
 }
