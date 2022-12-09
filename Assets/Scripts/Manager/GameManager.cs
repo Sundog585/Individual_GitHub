@@ -77,8 +77,8 @@ public class GameManager : MonoBehaviour
         Cursor.visible = false;
         player = GameObject.FindGameObjectWithTag("Player");    //mapManager의 초기화보다 앞에 있어야 한다.
         store = GameObject.FindGameObjectWithTag("Store");
-        playerUI = player.transform.GetChild(1).gameObject; // 잠시 지워놓은것
-        if(mapManager == null)
+        playerUI = GameObject.FindGameObjectWithTag("PlayerUI");
+        if (mapManager == null)
         {
             mapManager = GetComponent<MapManager>();
         }
