@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TreeEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -84,6 +85,18 @@ public class PlayerTank : BaseTank, IMoney
     public float turretTurnSpeed = 10.0f;
     //float mouseY = 0;
     public bool zoomMode;
+    
+    //경사로 이동------------------------------------------------------
+    public Vector3 direction { get; private set; }
+    const float CONVERT_UNIT_VALUE = 0.01f;
+    const float DEFAULT_CNVERT_MOVESPEED = 3f;
+    float frontGroundHeight;
+    float maxSlopeAngle = 70.0f;        // 캐릭터가 등반할 수 있는 최대 경사 각도
+    public Transform raycastOrigin;    // 경사 지형을 체크할 Raycast 발사 시작 지점
+    const float RAY_DISTANCE = 2f;
+    RaycastHit slopeHit;
+    public Transform groundCheck;      // 캐릭터가 땅에 붙어 있는지 확인하기 위한 CheckBox 시작 지점.
+    int groundLayer;
 
     Slider HpBar;
     StoreManager store;
@@ -93,10 +106,6 @@ public class PlayerTank : BaseTank, IMoney
     Vector2 inputDir = Vector2.zero;
 
     // 플레이어 위치
-
-    Vector3 dir;
-    Vector3 oldDir = Vector3.down;
-
     Vector3Int currentMap = Vector3Int.one;     // 플레이어가 존재하는 맵의 번호
     Vector3 mapSize = new Vector3(100, 0,100);      // 맵 하나의 크기
     Vector3Int mapCount = new Vector3Int(3, 0,3); //맵의 갯수(가로,세로)
@@ -120,30 +129,32 @@ public class PlayerTank : BaseTank, IMoney
     {
         base.Awake();
 
-        HpBar = GetComponentInChildren<Slider>();
-        onHealthChange += (ratio) =>
-        {
-            HpBar.value = ratio;
-        };
+
         inputActions = new PlayerInputSystem();
         siegeTankMode = () => { SiegeTankMode(); };
         normalTankMode = () => { NormalMode(); };
 
         // 월드 원점에서 맵이 얼마나 이동해 있는가? => offset으로 저장
         offset = new Vector3(mapSize.x * mapCount.x * -0.5f,0, mapSize.z * mapCount.z * -0.5f);
+
+        groundLayer = 1 << LayerMask.NameToLayer("Ground");
     }
 
     protected override void Start()
     {
         base.Start();
+        HpBar = GameManager.Instance.PlayerUI.GetComponentInChildren<Slider>();
+        onHealthChange += (ratio) =>
+        {
+            HpBar.value = ratio;
+        };
+
         store = GameManager.Instance.Store.GetComponent<StoreManager>();
     }
 
     private void FixedUpdate()
     {
-        rigid.AddForce(inputDir.y * moveSpeed * transform.forward); // 전진 후진
-        rigid.AddTorque(inputDir.x * turnSpeed * transform.up);     // 좌회전 우회전
-        //transform.Translate(inputDir * moveSpeed * Time.fixedDeltaTime, Space.Self);
+        Move();
 
         Vector3 pos = (Vector3)transform.position - offset; // 맵의 왼쪽 아래가 원점이라고 가정했을 때 나의 위치
         CurrentMap = new Vector3Int((int)(pos.x / mapSize.x),0 ,(int)(pos.z / mapSize.z));    // 위치를 맵 하나의 크기로 나누어서 (,)맵인지 계산
@@ -182,7 +193,6 @@ public class PlayerTank : BaseTank, IMoney
     {
         if (!CameraManager.zoomMode)//
         {
-
             Fire(ShellType.Normal);
         }
         else
@@ -233,12 +243,15 @@ public class PlayerTank : BaseTank, IMoney
     }
 
 
-    private void OnMove(InputAction.CallbackContext context)
+    public void OnMove(InputAction.CallbackContext context)
     {
         inputDir = context.ReadValue<Vector2>();
+        direction = new Vector3(inputDir.x, 0f, inputDir.y);
     }
 
-    void TurretTurn()
+
+
+    private void TurretTurn()
     {
         //if (!isDead)
         //{
@@ -255,4 +268,80 @@ public class PlayerTank : BaseTank, IMoney
             fireDatas[(int)type].ResetCoolTime();   // 쿨타임 다시 돌리기
         }
     }
+
+    // 경사로 함수들------------
+
+    private void Move()
+    {
+        //transform.Translate(inputDir * moveSpeed * Time.fixedDeltaTime, Space.Self);
+        bool isOnSlope = IsOnSlope();
+        bool isGrounded = IsGrounded();
+
+        Vector3 velocity = CalculateNextFrameGroundAngle(moveSpeed) < maxSlopeAngle ? direction : Vector3.zero;
+        //Vector3 gravity = Vector3.down * Mathf.Abs(rigid.velocity.y);
+
+        if(isGrounded && isOnSlope)
+        {
+            //velocity = AdjustDirectionToSlope(direction);   // 여기 더 고민 해보기
+            //rigid.constraints = RigidbodyConstraints.FreezePositionY;
+            //transform.rotation = Quaternion.LookRotation(AdjustDirectionToSlope(direction));
+            //rigid.useGravity = false;
+            //rigid.useGravity = false;
+        }
+        else
+        {
+            //rigid.constraints = RigidbodyConstraints.FreezePositionY;
+            rigid.useGravity = true;
+            //transform.rotation = Quaternion.LookRotation(new Vector3(0, 0, 0));
+        }
+
+        rigid.AddForce(inputDir.y * moveSpeed * transform.forward); // 전진 후진
+        rigid.AddTorque(inputDir.x * turnSpeed * transform.up);     // 좌회전 우회전
+        //LookAt();
+        //rigid.velocity = velocity * currentMoveSpeed + gravity;
+    }
+    private float CalculateNextFrameGroundAngle(float moveSpeed)
+    {
+        var nextFramePlayerPosition = raycastOrigin.position + direction * moveSpeed * Time.fixedDeltaTime; // 다음 프레임 탱크 위치
+
+        if (Physics.Raycast(nextFramePlayerPosition, Vector3.down, out RaycastHit hitInfo, RAY_DISTANCE, groundLayer))
+        {
+            return Vector3.Angle(Vector3.up, hitInfo.normal);
+        }
+        return 0f;
+    }
+
+    public bool IsGrounded()
+    {
+        Vector3 boxSize = new Vector3(transform.lossyScale.x, 0.4f, transform.lossyScale.z);
+        return Physics.CheckBox(groundCheck.position, boxSize, Quaternion.identity, groundLayer);
+    }
+
+    public bool IsOnSlope()
+    {
+        Ray ray = new Ray(transform.position, Vector3.down);
+        if(Physics.Raycast(ray, out slopeHit, RAY_DISTANCE, groundLayer))
+        {
+            var angle = Vector3.Angle(Vector3.up, slopeHit.normal);
+            return angle != 0f && angle < maxSlopeAngle;
+        }
+        return false;
+    }
+    private void LookAt()
+    {
+        if (direction != Vector3.zero)
+        {
+            Quaternion targetAngle = Quaternion.LookRotation(direction);
+            rigid.rotation = targetAngle;
+        }
+    }
+
+    private Vector3 AdjustDirectionToSlope(Vector3 direction)
+    {
+        Vector3 adjustVelocityDirection = Vector3.ProjectOnPlane(direction, slopeHit.normal).normalized;
+        return adjustVelocityDirection;
+    }
+
+
+
 }

@@ -22,6 +22,8 @@ public class StoreManager : MonoBehaviour
     PlayerTank player;
     PlayerUI playerUI;
     Shell shell;
+    RectTransform rectTransform;
+    
 
     public Action<float> onMoneyChange { get => ((IMoney)player).onMoneyChange; set => ((IMoney)player).onMoneyChange = value; }
 
@@ -31,11 +33,15 @@ public class StoreManager : MonoBehaviour
         playerUI = GameManager.Instance.PlayerUI.GetComponent<PlayerUI>();
         player = GameManager.Instance.Player.GetComponent<PlayerTank>();
         shell = GameManager.Instance.Shell.GetComponent<Shell>();
+        rectTransform = transform.GetChild(0).GetComponent<RectTransform>();
+
         moneyText.text = $"{player.money}";
         onMoneyChange += (money) =>
         {
             moneyText.text = $"{money}";
         };
+
+
     }
     public void OnClickAttackUpgrade()
     {
@@ -72,11 +78,13 @@ public class StoreManager : MonoBehaviour
 
     public void OnClickClose()
     {
-        this.gameObject.SetActive(false);
+        //this.gameObject.SetActive(false);
+        rectTransform.anchoredPosition = new(0,900);
     }
 
     public void OpenStore()
     {
-        this.gameObject.SetActive(true);
+        //this.gameObject.SetActive(true);
+        rectTransform.anchoredPosition = new(0, 0);
     }
 }
