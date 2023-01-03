@@ -40,6 +40,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Skill_Barrier",
+                    "type": "Button",
+                    "id": "0b64bb1a-1762-4d48-a291-1e13ab4606e0",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -128,6 +137,17 @@
                     "processors": "",
                     "groups": "K&M",
                     "action": "StoreOpen",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c5de1d6c-dd65-404f-b3ce-7ef527973169",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "K&M",
+                    "action": "Skill_Barrier",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

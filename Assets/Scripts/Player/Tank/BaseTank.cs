@@ -85,16 +85,14 @@ public class BaseTank : MonoBehaviour, IHit
     //    }
     //}
 
-    public void TakeDamage(float damage)
+    public virtual void TakeDamage(float damage)
     {
         float finalDamage = damage - defencePower;
         if (finalDamage < 1.0f)
         {
             finalDamage = 1.0f;
         }
-        HP -= finalDamage;
-        
-
+        HP -= finalDamage; 
     }
 
     public void Dead()

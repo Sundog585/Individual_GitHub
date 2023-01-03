@@ -88,9 +88,6 @@ public class PlayerTank : BaseTank, IMoney
     
     //경사로 이동------------------------------------------------------
     public Vector3 direction { get; private set; }
-    const float CONVERT_UNIT_VALUE = 0.01f;
-    const float DEFAULT_CNVERT_MOVESPEED = 3f;
-    float frontGroundHeight;
     float maxSlopeAngle = 70.0f;        // 캐릭터가 등반할 수 있는 최대 경사 각도
     public Transform raycastOrigin;    // 경사 지형을 체크할 Raycast 발사 시작 지점
     const float RAY_DISTANCE = 2f;
@@ -125,10 +122,14 @@ public class PlayerTank : BaseTank, IMoney
     }
     public Action<Vector3Int> onMapChange;
 
+    // 스킬 베리어 ----------------------------------------------------------------------------------------
+    private Skill_Barrier barrier;
+
     protected override void Awake()
     {
         base.Awake();
 
+        barrier = GetComponent<Skill_Barrier>();
 
         inputActions = new PlayerInputSystem();
         siegeTankMode = () => { SiegeTankMode(); };
@@ -150,6 +151,12 @@ public class PlayerTank : BaseTank, IMoney
         };
 
         store = GameManager.Instance.Store.GetComponent<StoreManager>();
+
+        CoolTimePanel coolTimePanel = FindObjectOfType<CoolTimePanel>();
+        barrier.onCoolTimeChange += coolTimePanel[0].RefreshUI;
+        barrier.onDurationTimeChange += coolTimePanel[0].RefreshUI;
+        barrier.onDurationMode += coolTimePanel[0].SetDurationMode;
+        fireDatas[1].onCoolTimeChange += coolTimePanel[1].RefreshUI;
     }
 
     private void FixedUpdate()
@@ -175,11 +182,14 @@ public class PlayerTank : BaseTank, IMoney
         inputActions.Player.Look.canceled += OnMouseMove;
         inputActions.Player.NormalFire.performed += OnNormalFire;
         inputActions.Player.StoreOpen.performed += OnStoreOpen;
+        inputActions.Player.Skill_Barrier.performed += OnBarrierActivate;
     }
 
 
     private void OnDisable()
     {
+        inputActions.Player.Skill_Barrier.performed -= OnBarrierActivate;
+        inputActions.Player.StoreOpen.performed -= OnStoreOpen;
         inputActions.Player.NormalFire.performed -= OnNormalFire;
         inputActions.Player.Look.canceled -= OnMouseMove;
         inputActions.Player.Look.performed -= OnMouseMove;
@@ -218,6 +228,10 @@ public class PlayerTank : BaseTank, IMoney
         }
         //Vector2 pos = context.ReadValue<Vector2>();
 
+    }
+    private void OnBarrierActivate(InputAction.CallbackContext _)
+    {
+        barrier.UseSkill();
     }
     private void OnStoreOpen(InputAction.CallbackContext context)
     {
@@ -268,6 +282,15 @@ public class PlayerTank : BaseTank, IMoney
             fireDatas[(int)type].ResetCoolTime();   // 쿨타임 다시 돌리기
         }
     }
+
+    public override void TakeDamage(float damage)
+    {
+        if (!barrier.IsSkillActivate)
+        {
+            base.TakeDamage(damage);
+        }
+    }
+
 
     // 경사로 함수들------------
 
