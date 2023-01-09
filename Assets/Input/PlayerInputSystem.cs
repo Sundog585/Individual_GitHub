@@ -71,6 +71,15 @@ public partial class @PlayerInputSystem : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Skill_MachineGun"",
+                    ""type"": ""Button"",
+                    ""id"": ""a93d4358-abcb-474c-97ca-f41060caccf1"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -172,6 +181,17 @@ public partial class @PlayerInputSystem : IInputActionCollection2, IDisposable
                     ""action"": ""Skill_Barrier"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1a244bac-54b4-460d-aa54-661bf40ef370"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""K&M"",
+                    ""action"": ""Skill_MachineGun"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -258,6 +278,7 @@ public partial class @PlayerInputSystem : IInputActionCollection2, IDisposable
         m_Player_NormalFire = m_Player.FindAction("NormalFire", throwIfNotFound: true);
         m_Player_StoreOpen = m_Player.FindAction("StoreOpen", throwIfNotFound: true);
         m_Player_Skill_Barrier = m_Player.FindAction("Skill_Barrier", throwIfNotFound: true);
+        m_Player_Skill_MachineGun = m_Player.FindAction("Skill_MachineGun", throwIfNotFound: true);
         // Camera
         m_Camera = asset.FindActionMap("Camera", throwIfNotFound: true);
         m_Camera_ZoomInOut = m_Camera.FindAction("ZoomInOut", throwIfNotFound: true);
@@ -328,6 +349,7 @@ public partial class @PlayerInputSystem : IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_NormalFire;
     private readonly InputAction m_Player_StoreOpen;
     private readonly InputAction m_Player_Skill_Barrier;
+    private readonly InputAction m_Player_Skill_MachineGun;
     public struct PlayerActions
     {
         private @PlayerInputSystem m_Wrapper;
@@ -337,6 +359,7 @@ public partial class @PlayerInputSystem : IInputActionCollection2, IDisposable
         public InputAction @NormalFire => m_Wrapper.m_Player_NormalFire;
         public InputAction @StoreOpen => m_Wrapper.m_Player_StoreOpen;
         public InputAction @Skill_Barrier => m_Wrapper.m_Player_Skill_Barrier;
+        public InputAction @Skill_MachineGun => m_Wrapper.m_Player_Skill_MachineGun;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -361,6 +384,9 @@ public partial class @PlayerInputSystem : IInputActionCollection2, IDisposable
                 @Skill_Barrier.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSkill_Barrier;
                 @Skill_Barrier.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSkill_Barrier;
                 @Skill_Barrier.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSkill_Barrier;
+                @Skill_MachineGun.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSkill_MachineGun;
+                @Skill_MachineGun.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSkill_MachineGun;
+                @Skill_MachineGun.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSkill_MachineGun;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -380,6 +406,9 @@ public partial class @PlayerInputSystem : IInputActionCollection2, IDisposable
                 @Skill_Barrier.started += instance.OnSkill_Barrier;
                 @Skill_Barrier.performed += instance.OnSkill_Barrier;
                 @Skill_Barrier.canceled += instance.OnSkill_Barrier;
+                @Skill_MachineGun.started += instance.OnSkill_MachineGun;
+                @Skill_MachineGun.performed += instance.OnSkill_MachineGun;
+                @Skill_MachineGun.canceled += instance.OnSkill_MachineGun;
             }
         }
     }
@@ -466,6 +495,7 @@ public partial class @PlayerInputSystem : IInputActionCollection2, IDisposable
         void OnNormalFire(InputAction.CallbackContext context);
         void OnStoreOpen(InputAction.CallbackContext context);
         void OnSkill_Barrier(InputAction.CallbackContext context);
+        void OnSkill_MachineGun(InputAction.CallbackContext context);
     }
     public interface ICameraActions
     {

@@ -15,7 +15,7 @@ public class StoreManager : MonoBehaviour
 
     int attackUpgradePrice = 1;
     int defenceUpgradePrice = 1;
-    int attackUpgradeDamage = 10;
+    int attackUpgradeDamage = 1;
 
 
 

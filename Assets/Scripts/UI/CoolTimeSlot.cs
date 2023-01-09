@@ -36,11 +36,12 @@ public class CoolTimeSlot : MonoBehaviour
     {
         if (duration)
         {
-            progressImage.color = Color.cyan;
+            progressImage.color = new Color(0,1,1,103.0f);
         }
         else
         {
-            progressImage.color = new Color(0.9339623f, 0.8883526f, 0.2070577f);
+            //progressImage.color = new Color(0.9339623f, 0.8883526f, 0.2070577f);
+            progressImage.color = new Color(255,0,0,103.0f);
         }
     }
 }

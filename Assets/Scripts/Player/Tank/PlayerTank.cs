@@ -125,11 +125,15 @@ public class PlayerTank : BaseTank, IMoney
     // 스킬 베리어 ----------------------------------------------------------------------------------------
     private Skill_Barrier barrier;
 
+    // 스킬 머신건 ----------------------------------------------------------------------------------------
+    private Skill_MachineGun machineGun;
+
     protected override void Awake()
     {
         base.Awake();
 
         barrier = GetComponent<Skill_Barrier>();
+        machineGun = GetComponent<Skill_MachineGun>();
 
         inputActions = new PlayerInputSystem();
         siegeTankMode = () => { SiegeTankMode(); };
@@ -183,11 +187,17 @@ public class PlayerTank : BaseTank, IMoney
         inputActions.Player.NormalFire.performed += OnNormalFire;
         inputActions.Player.StoreOpen.performed += OnStoreOpen;
         inputActions.Player.Skill_Barrier.performed += OnBarrierActivate;
+        inputActions.Player.Skill_MachineGun.performed += OnMachineGunActivate;
     }
 
+    private void OnMachineGunActivate(InputAction.CallbackContext obj)
+    {
+        machineGun.UseSkill();
+    }
 
     private void OnDisable()
     {
+        inputActions.Player.Skill_MachineGun.performed -= OnMachineGunActivate;
         inputActions.Player.Skill_Barrier.performed -= OnBarrierActivate;
         inputActions.Player.StoreOpen.performed -= OnStoreOpen;
         inputActions.Player.NormalFire.performed -= OnNormalFire;
@@ -231,7 +241,10 @@ public class PlayerTank : BaseTank, IMoney
     }
     private void OnBarrierActivate(InputAction.CallbackContext _)
     {
-        barrier.UseSkill();
+        if (!barrier.IsSkillActivate)
+        {
+            barrier.UseSkill();
+        }
     }
     private void OnStoreOpen(InputAction.CallbackContext context)
     {

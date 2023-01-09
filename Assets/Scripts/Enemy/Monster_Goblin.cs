@@ -210,6 +210,7 @@ public class Monster_Goblin : MonoBehaviour, IHit
     {
         if (!isDead)
         {
+            gameObject.layer = LayerMask.NameToLayer("Default");    // 죽었을 때 락온이 다시 되지 않게 하기 위해 설정
             anim.SetBool("Dead", true);
             anim.SetTrigger("Die");
             isDead = true;

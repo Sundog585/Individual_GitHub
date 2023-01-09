@@ -49,6 +49,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Skill_MachineGun",
+                    "type": "Button",
+                    "id": "a93d4358-abcb-474c-97ca-f41060caccf1",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -148,6 +157,17 @@
                     "processors": "",
                     "groups": "K&M",
                     "action": "Skill_Barrier",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1a244bac-54b4-460d-aa54-661bf40ef370",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "K&M",
+                    "action": "Skill_MachineGun",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
