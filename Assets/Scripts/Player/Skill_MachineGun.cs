@@ -1,13 +1,19 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Skill_MachineGun : MonoBehaviour
 {
-    public GameObject sparkEffect;
-    public GameObject lockOnEffect;
+    public GameObject playerTank;
+    public GameObject lockOnEffect;         // 락온 이팩트
     Transform lockOnTarget;
+    private IHit targetTakeDamage;
     float lockOnRange = 5.0f;
+    float damage = 1.0f;
+    bool isDelay;
+    float delayTime = 1.0f;
+
     public Transform LockOnTarget { get => lockOnTarget; }  // 락온 대상의 트랜스폼. 읽기 전용 프로퍼티 추가
 
     private void Start()
@@ -17,25 +23,44 @@ public class Skill_MachineGun : MonoBehaviour
             lockOnEffect = GameObject.Find("LockOnEffect");
             lockOnEffect.SetActive(false);
         }
-        sparkEffect = lockOnEffect.gameObject.transform.GetChild(5).gameObject;
+
+        playerTank = transform.gameObject;
+    }
+
+    private void Update()
+    {
+        if (lockOnEffect.activeSelf)
+        {
+            if(isDelay == false)
+            {
+                isDelay = true;
+                targetTakeDamage.TakeDamage(damage);
+                StartCoroutine(RPM());
+            }
+        }
+    }
+    IEnumerator RPM()
+    {
+        yield return new WaitForSeconds(delayTime);
+        isDelay = false;
     }
 
     public void UseSkill()
     {
-        if (lockOnTarget == null)
-        {
-            // 락온 시도
-            LockOn();
-        }
-        else
-        {
-            // 락온된 타겟이 있음
-            if (!LockOn())  // 다시 락온을 시도
-            {
-                // 새롭게 락온이 안되면 락온 풀기
-                LockOff();
-            }
-        }
+       if (lockOnTarget == null)
+       {
+           // 락온 시도
+           LockOn();
+       }
+       else
+       {
+           // 락온된 타겟이 있음
+           if (!LockOn())  // 다시 락온을 시도
+           {
+               // 새롭게 락온이 안되면 락온 풀기
+               LockOff();
+           }
+       }
     }
 
     bool LockOn()
@@ -61,7 +86,7 @@ public class Skill_MachineGun : MonoBehaviour
                 }
             }
 
-            if (lockOnTarget?.gameObject != nearest.gameObject) // 다른 대상을 락온 할 때만 실생
+            if (lockOnTarget?.gameObject != nearest.gameObject) // 다른 대상을 락온 할 때만 실행
             {
                 if (LockOnTarget != null)
                 {
@@ -70,12 +95,15 @@ public class Skill_MachineGun : MonoBehaviour
 
                 lockOnTarget = nearest.transform;   // 가장 가까이 있는 대상을 락온 대상으로 설정
                                                     //Debug.Log($"Lock on : {lockOnTarget.name}");
+                targetTakeDamage = lockOnTarget.gameObject.GetComponent<IHit>();
 
                 //lockOnTarget.gameObject.GetComponent<Goblin_Warrior>().onDead += LockOff;
+                
 
                 lockOnEffect.transform.position = lockOnTarget.position;    // 락온 이팩트를 락온 대상의 위치로 이동
                 lockOnEffect.transform.parent = lockOnTarget;               // 락온 이팩트의 부모를 락온 대상으로 설정
                 lockOnEffect.SetActive(true);                               // 락온 이팩트 보여주기
+                //sparkEffect.TargetChange();
 
                 result = true;
             }
@@ -87,7 +115,7 @@ public class Skill_MachineGun : MonoBehaviour
     {
         //lockOnTarget.gameObject.GetComponent<Goblin_Warrior>().onDead -= LockOff;
         lockOnTarget = null;                    // 락온 대상 null
-        lockOnEffect.transform.parent = null;   // 락온 이팩트의 부모 제거
+        lockOnEffect.transform.parent = playerTank.transform;   // 락온 이팩트의 부모 플레이어에게 돌려놓기
         lockOnEffect.SetActive(false);          // 락온 이팩트 보이지 않게 하기
     }
 
