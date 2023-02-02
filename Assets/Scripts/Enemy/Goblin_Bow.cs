@@ -4,12 +4,13 @@ using UnityEngine;
 
 public class Goblin_Bow : Monster_Goblin
 {
-    public GameObject weapon;
+    public float goblinBowAttackSpeed = 2.0f;
+    public GameObject arrow;
+    public Transform shotPosition;
 
     protected override void Awake()
     {
         base.Awake();
-        weapon = GetComponentInChildren<Weapon_Bow>().gameObject;
     }
 
     protected override void Start()
@@ -18,5 +19,17 @@ public class Goblin_Bow : Monster_Goblin
         maxHP = 100.0f;
         HP = maxHP;
         defencePower = 1.0f;
+    }
+
+    public override void AttackUpdate()
+    {
+        if (attackCoolTime < 0.0f)
+        {
+            transform.rotation = Quaternion.Slerp(transform.rotation,
+                Quaternion.LookRotation(target.transform.position - transform.position), 0.7f); // 에니메이션이랑 화살 나가는 속도가 싱크가 안됨. 에니메이션 바로 실행되는 방법 알아보기
+            anim.SetTrigger("Attack");
+            Instantiate(arrow, shotPosition.position, shotPosition.rotation);
+            attackCoolTime = attackSpeed + goblinBowAttackSpeed;
+        }
     }
 }
