@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
@@ -21,6 +22,7 @@ public class Monster_Goblin : MonoBehaviour, IHit
     // HP용
     public bool takeDamage = false;
     protected bool isDead = false;
+    public bool isAttack = false;
     public float maxHP = 100.0f;
     public float hp;
     public Vector3 hitPoint = Vector3.zero; // 충돌 위치
@@ -58,6 +60,7 @@ public class Monster_Goblin : MonoBehaviour, IHit
     protected GameObject player;
     public Transform target;
     protected PlayerTank playerTank;
+    protected Goblin_Group group;
 
     public float AttackPower { get => attackPower; }
     public float DefencePower { get => defencePower; }
@@ -79,27 +82,34 @@ public class Monster_Goblin : MonoBehaviour, IHit
         target = player.transform;
         playerTank = player.GetComponent<PlayerTank>();
         state = MonsterState.Idle;
+        if(transform.parent != null)
+        {
+            group = GetComponentInParent<Goblin_Group>();
+        }
     }
 
     public void Update()
     {
         attackCoolTime -= Time.deltaTime;
-        switch (state)
+        if (!isDead)
         {
-            case MonsterState.Idle:
-                IdleUpdate();
-                break;
-            case MonsterState.Chase:
-                ChaseUpdate();
-                break;
-            case MonsterState.Attack:
-                AttackUpdate();
-                break;
-            case MonsterState.Dead:
-                Dead();
-                break;
-            default:
-                break;
+            switch (state)
+            {
+                case MonsterState.Idle:
+                    IdleUpdate();
+                    break;
+                case MonsterState.Chase:
+                    ChaseUpdate();
+                    break;
+                case MonsterState.Attack:
+                    AttackUpdate();
+                    break;
+                case MonsterState.Dead:
+                    Dead();
+                    break;
+                default:
+                    break;
+            }
         }
         // 미니맵
         //quadPosition = new Vector3(quad.position.x, transform.position.y, quad.position.z); //미니맵고정용
@@ -113,7 +123,10 @@ public class Monster_Goblin : MonoBehaviour, IHit
         {
             hitPoint = collision.contacts[0].point;
             hitPoint.y = -1.0f;
-            ChangeState(MonsterState.Chase);
+            if (!isAttack)
+            {
+                ChangeState(MonsterState.Chase);
+            }
             return;
         }
     }
@@ -130,7 +143,10 @@ public class Monster_Goblin : MonoBehaviour, IHit
     {
         if (other.gameObject.CompareTag("Player"))
         {
-            ChangeState(MonsterState.Chase);
+            if (!isDead)
+            {
+                ChangeState(MonsterState.Chase);
+            }
             return;
         }
     }
@@ -187,7 +203,8 @@ public class Monster_Goblin : MonoBehaviour, IHit
         {
             transform.rotation = Quaternion.Slerp(transform.rotation,
                 Quaternion.LookRotation(target.transform.position - transform.position), 0.1f);
-            anim.SetTrigger("Attack"); 
+            anim.SetTrigger("Attack");
+            isAttack = true;
         }
     }
 
@@ -242,7 +259,15 @@ public class Monster_Goblin : MonoBehaviour, IHit
         {
             anim.SetTrigger("TakeDamage");
             attackCoolTime = attackSpeed;
-            ChangeState(MonsterState.Chase);
+            if (!isAttack)
+            {
+                ChangeState(MonsterState.Chase);
+                if (transform.parent != null)
+                {
+                    group.GroupChase();
+                    transform.parent = null;
+                }
+            }
         }
         else
         {

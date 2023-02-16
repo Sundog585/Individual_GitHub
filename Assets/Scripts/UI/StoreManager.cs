@@ -5,7 +5,7 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
-//using static System.Net.Mime.MediaTypeNames;
+using static System.Net.Mime.MediaTypeNames;
 
 public class StoreManager : MonoBehaviour
 {
@@ -13,9 +13,10 @@ public class StoreManager : MonoBehaviour
     public Button closeButton;
     public TextMeshProUGUI moneyText;
 
-    int attackUpgradePrice = 1;
-    int defenceUpgradePrice = 1;
-    int attackUpgradeDamage = 1;
+    int UpgradePrice = 1;
+    int defenceUpgradeValue = 1;
+    int attackUpgradeValue = 1;
+    int SpeedUpgradeValue = 1;
 
 
 
@@ -47,44 +48,54 @@ public class StoreManager : MonoBehaviour
     {
         if(player.money != 0)
         {
-            player.Money -= attackUpgradePrice;
-            player.shellDamage += attackUpgradeDamage;
+            player.Money -= UpgradePrice;
+            player.ShellDamage += attackUpgradeValue;
         }
         else
         {
             playerUI.MoneyNotEnough();
         }
-
-        
-        Debug.Log(shell.Data.damage);
     }
 
     public void OnClickDefenceUpgrade()
     {
         if (player.money != 0)
         {
-            player.Money -= attackUpgradePrice;
-            player.defencePower += defenceUpgradePrice;
+            player.Money -= UpgradePrice;
+            player.DefencePower += defenceUpgradeValue;
             // 강화 금액 점점 증가하게 할지 고민해보기
         }
         else
         {
             playerUI.MoneyNotEnough();
         }
+    }
 
-
-        Debug.Log(shell.Data.damage);
+    public void OnClickSpeedUpgrade()
+    {
+        if (player.money != 0)
+        {
+            player.Money -= UpgradePrice;
+            player.MoveSpeed += SpeedUpgradeValue;
+            // 강화 금액 점점 증가하게 할지 고민해보기
+        }
+        else
+        {
+            playerUI.MoneyNotEnough();
+        }
     }
 
     public void OnClickClose()
     {
         //this.gameObject.SetActive(false);
         rectTransform.anchoredPosition = new(0,900);
+        player.storeMode = false;
     }
 
     public void OpenStore()
     {
         //this.gameObject.SetActive(true);
         rectTransform.anchoredPosition = new(0, 0);
+        player.storeMode = true;
     }
 }

@@ -10,19 +10,23 @@ public class PlayerUI : MonoBehaviour,IMoney
 {
     TextMeshProUGUI attackDamage;
     TextMeshProUGUI defenceValue;
+    TextMeshProUGUI speedValue;
     TextMeshProUGUI moneyNotEnough;
     Shell shell;
     PlayerTank player;
 
     public Action<float> onMoneyChange { get; set; }
-    public Action<float> onDamageChange { get; set; }
-    public Action<float> onDefenceChange { get; set; }
+    public Action<float> onDamageChange { get => player.onDamageChange; set => player.onDamageChange = value; }
+    public Action<float> onDefenceChange { get => player.onDefenceChange; set => player.onDefenceChange = value; }
+    public Action<float> onSpeedChange { get => player.onSpeedChange; set => player.onSpeedChange = value; }
+    //public Action<float> onDamageChange { get => ((IMoney)player).onDamageChange; set => ((IMoney)player).onDamageChange = value; }
 
     private void Awake()
     {
 
         attackDamage = transform.Find("ShellDamage").transform.GetChild(0).GetComponent<TextMeshProUGUI>();
         defenceValue = transform.Find("DefenceValue").transform.GetChild(0).GetComponent<TextMeshProUGUI>();
+        speedValue = transform.Find("SpeedValue").transform.GetChild(0).GetComponent<TextMeshProUGUI>();
         moneyNotEnough = transform.Find("MoneyEmpty").GetComponent<TextMeshProUGUI>();
         //shell = GameManager.Instance.Shell.GetComponent<Shell>();
     }
@@ -32,13 +36,9 @@ public class PlayerUI : MonoBehaviour,IMoney
         player = GameManager.Instance.Player.GetComponent<PlayerTank>();
         shell = GameManager.Instance.Shell.GetComponent<Shell>();
         moneyNotEnough.color = new Color(moneyNotEnough.color.r, moneyNotEnough.color.g, moneyNotEnough.color.b, 0);
-    }
-
-    private void Update()
-    {
-        //attackDamage.text = $"Shell Damge : {shell.Data.damage}";
         ShellDamageTextChange();
         DefenceValueTextChange();
+        SpeedValueTextChange();
     }
 
     void ShellDamageTextChange()
@@ -55,7 +55,16 @@ public class PlayerUI : MonoBehaviour,IMoney
         defenceValue.text = $"Defence Value : {player.defencePower}";
         onDefenceChange += (defence) =>
         {
-            attackDamage.text = $"Shell Damge : {defence}";
+            defenceValue.text = $"Defence Value : {defence}";
+        };
+    }
+
+    void SpeedValueTextChange()
+    {
+        speedValue.text = $"Speed Value : {player.moveSpeed}";
+        onSpeedChange += (speed) =>
+        {
+            speedValue.text = $"Speed Value : {speed}";
         };
     }
 

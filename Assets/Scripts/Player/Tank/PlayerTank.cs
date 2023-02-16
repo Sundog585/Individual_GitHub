@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using TreeEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -18,7 +17,7 @@ public class PlayerTank : BaseTank, IMoney
     public float shellDamage = 20.0f;
 
 
-    public float ShellDamge
+    public float ShellDamage
     {
         get => shellDamage;
         set
@@ -46,9 +45,22 @@ public class PlayerTank : BaseTank, IMoney
         
     }
 
+    public float MoveSpeed
+    {
+        get => moveSpeed;
+        set
+        {
+            if (value != moveSpeed)
+            {
+                moveSpeed = value;
+                onSpeedChange?.Invoke(moveSpeed);
+            }
+        }
+    }
+
     public bool StoreOn { get; set; }
 
-    public int money = 3;
+    public int money = 10;
 
     public int Money
     {
@@ -72,6 +84,7 @@ public class PlayerTank : BaseTank, IMoney
     public Action<float> onMoneyChange { get; set; }
     public Action<float> onDamageChange { get; set; }
     public Action<float> onDefenceChange { get; set; }
+    public Action<float> onSpeedChange { get; set; }
     //--------------------------------------------------------------
     public static Action siegeTankMode;
     public static Action normalTankMode;
@@ -85,15 +98,12 @@ public class PlayerTank : BaseTank, IMoney
     public float turretTurnSpeed = 10.0f;
     //float mouseY = 0;
     public bool zoomMode;
+    public bool storeMode;
     
     //경사로 이동------------------------------------------------------
     public Vector3 direction { get; private set; }
-    float maxSlopeAngle = 70.0f;        // 캐릭터가 등반할 수 있는 최대 경사 각도
     public Transform raycastOrigin;    // 경사 지형을 체크할 Raycast 발사 시작 지점
-    const float RAY_DISTANCE = 2f;
-    RaycastHit slopeHit;
     public Transform groundCheck;      // 캐릭터가 땅에 붙어 있는지 확인하기 위한 CheckBox 시작 지점.
-    int groundLayer;
 
     Slider HpBar;
     StoreManager store;
@@ -142,7 +152,6 @@ public class PlayerTank : BaseTank, IMoney
         // 월드 원점에서 맵이 얼마나 이동해 있는가? => offset으로 저장
         offset = new Vector3(mapSize.x * mapCount.x * -0.5f,0, mapSize.z * mapCount.z * -0.5f);
 
-        groundLayer = 1 << LayerMask.NameToLayer("Ground");
     }
 
     protected override void Start()
@@ -161,6 +170,7 @@ public class PlayerTank : BaseTank, IMoney
         barrier.onDurationTimeChange += coolTimePanel[0].RefreshUI;
         barrier.onDurationMode += coolTimePanel[0].SetDurationMode;
         fireDatas[1].onCoolTimeChange += coolTimePanel[1].RefreshUI;
+        storeMode = false;
     }
 
     private void FixedUpdate()
@@ -185,7 +195,7 @@ public class PlayerTank : BaseTank, IMoney
         inputActions.Player.Look.performed += OnMouseMove;
         inputActions.Player.Look.canceled += OnMouseMove;
         inputActions.Player.NormalFire.performed += OnNormalFire;
-        inputActions.Player.StoreOpen.performed += OnStoreOpen;
+        //inputActions.Player.StoreOpen.performed += OnStoreOpen;   // 스토어는 팩토리에서 열기
         inputActions.Player.Skill_Barrier.performed += OnBarrierActivate;
         inputActions.Player.Skill_MachineGun.performed += OnMachineGunActivate;
     }
@@ -199,7 +209,7 @@ public class PlayerTank : BaseTank, IMoney
     {
         inputActions.Player.Skill_MachineGun.performed -= OnMachineGunActivate;
         inputActions.Player.Skill_Barrier.performed -= OnBarrierActivate;
-        inputActions.Player.StoreOpen.performed -= OnStoreOpen;
+        //inputActions.Player.StoreOpen.performed -= OnStoreOpen;
         inputActions.Player.NormalFire.performed -= OnNormalFire;
         inputActions.Player.Look.canceled -= OnMouseMove;
         inputActions.Player.Look.performed -= OnMouseMove;
@@ -211,13 +221,16 @@ public class PlayerTank : BaseTank, IMoney
 
     private void OnNormalFire(InputAction.CallbackContext context)
     {
-        if (!CameraManager.zoomMode)//
+        if (!storeMode)
         {
-            Fire(ShellType.Normal);
-        }
-        else
-        {
-            Fire(ShellType.Siege);
+            if (!CameraManager.zoomMode)
+            {
+                Fire(ShellType.Normal);
+            }
+            else
+            {
+                Fire(ShellType.Siege);
+            }
         }
     }
 
@@ -246,19 +259,19 @@ public class PlayerTank : BaseTank, IMoney
             barrier.UseSkill();
         }
     }
-    private void OnStoreOpen(InputAction.CallbackContext context)
-    {
-        if (StoreOn)
-        {
-            StoreOn = false;
-            store.OpenStore();
-        }
-        else
-        {
-            StoreOn = true;
-            store.OnClickClose();
-        }
-    }
+    //private void OnStoreOpen(InputAction.CallbackContext context)
+    //{
+    //    if (StoreOn)
+    //    {
+    //        StoreOn = false;
+    //        store.OpenStore();
+    //    }
+    //    else
+    //    {
+    //        StoreOn = true;
+    //        store.OnClickClose();
+    //    }
+    //}
 
     public void SiegeTankMode()
     {
@@ -309,75 +322,8 @@ public class PlayerTank : BaseTank, IMoney
 
     private void Move()
     {
-        //transform.Translate(inputDir * moveSpeed * Time.fixedDeltaTime, Space.Self);
-        bool isOnSlope = IsOnSlope();
-        bool isGrounded = IsGrounded();
-
-        Vector3 velocity = CalculateNextFrameGroundAngle(moveSpeed) < maxSlopeAngle ? direction : Vector3.zero;
-        //Vector3 gravity = Vector3.down * Mathf.Abs(rigid.velocity.y);
-
-        if(isGrounded && isOnSlope)
-        {
-            //velocity = AdjustDirectionToSlope(direction);   // 여기 더 고민 해보기
-            //rigid.constraints = RigidbodyConstraints.FreezePositionY;
-            //transform.rotation = Quaternion.LookRotation(AdjustDirectionToSlope(direction));
-            //rigid.useGravity = false;
-            //rigid.useGravity = false;
-        }
-        else
-        {
-            //rigid.constraints = RigidbodyConstraints.FreezePositionY;
-            rigid.useGravity = true;
-            //transform.rotation = Quaternion.LookRotation(new Vector3(0, 0, 0));
-        }
-
         rigid.AddForce(inputDir.y * moveSpeed * transform.forward); // 전진 후진
         rigid.AddTorque(inputDir.x * turnSpeed * transform.up);     // 좌회전 우회전
-        //LookAt();
-        //rigid.velocity = velocity * currentMoveSpeed + gravity;
     }
-    private float CalculateNextFrameGroundAngle(float moveSpeed)
-    {
-        var nextFramePlayerPosition = raycastOrigin.position + direction * moveSpeed * Time.fixedDeltaTime; // 다음 프레임 탱크 위치
-
-        if (Physics.Raycast(nextFramePlayerPosition, Vector3.down, out RaycastHit hitInfo, RAY_DISTANCE, groundLayer))
-        {
-            return Vector3.Angle(Vector3.up, hitInfo.normal);
-        }
-        return 0f;
-    }
-
-    public bool IsGrounded()
-    {
-        Vector3 boxSize = new Vector3(transform.lossyScale.x, 0.4f, transform.lossyScale.z);
-        return Physics.CheckBox(groundCheck.position, boxSize, Quaternion.identity, groundLayer);
-    }
-
-    public bool IsOnSlope()
-    {
-        Ray ray = new Ray(transform.position, Vector3.down);
-        if(Physics.Raycast(ray, out slopeHit, RAY_DISTANCE, groundLayer))
-        {
-            var angle = Vector3.Angle(Vector3.up, slopeHit.normal);
-            return angle != 0f && angle < maxSlopeAngle;
-        }
-        return false;
-    }
-    private void LookAt()
-    {
-        if (direction != Vector3.zero)
-        {
-            Quaternion targetAngle = Quaternion.LookRotation(direction);
-            rigid.rotation = targetAngle;
-        }
-    }
-
-    private Vector3 AdjustDirectionToSlope(Vector3 direction)
-    {
-        Vector3 adjustVelocityDirection = Vector3.ProjectOnPlane(direction, slopeHit.normal).normalized;
-        return adjustVelocityDirection;
-    }
-
-
 
 }

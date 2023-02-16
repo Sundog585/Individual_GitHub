@@ -5,12 +5,6 @@ using UnityEngine;
 public class SiegeShellExplosion : MonoBehaviour
 {
     public float damage = 50;
-    //List<IHit> targetList = null;
-
-    private void Awake()
-    {
-        //targetList = new List<IHit>(8);
-    }
 
     private void OnTriggerEnter(Collider other)
     {
@@ -25,20 +19,22 @@ public class SiegeShellExplosion : MonoBehaviour
                 //{
                 //    target.HP -= damage;
                 //}
+                // 고블린이 죽고 나서도 이팩트에 들어오는거 같음
+                Destroy(this.gameObject, 3.0f);
             }
         }
     }
-    private void OnTriggerExit(Collider other)
-    {
-        if (!other.CompareTag("Player"))    // 플레이어가 아닌 대상이 나갔을 경우
-        {
-            //targetList.Remove(other.gameObject.GetComponent<IHit>());   // 리스트에서 제거
-            Invoke("Fin", 3.0f);
-        }
-    }
+    //private void OnTriggerExit(Collider other)
+    //{
+    //    if (!other.CompareTag("Player"))    // 플레이어가 아닌 대상이 나갔을 경우
+    //    {
+    //        //targetList.Remove(other.gameObject.GetComponent<IHit>());   // 리스트에서 제거
+    //        Invoke("Fin", 3.0f);
+    //    }
+    //}
 
-    public void Fin()
-    {
-        Destroy(this.gameObject);
-    }
+    //public void Fin()
+    //{
+    //    Destroy(this.gameObject);
+    //}
 }
