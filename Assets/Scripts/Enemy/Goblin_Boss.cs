@@ -4,14 +4,6 @@ using UnityEngine;
 
 public class Goblin_Boss : Monster_Goblin
 {
-    public GameObject weapon;
-
-    protected override void Awake()
-    {
-        base.Awake();
-        weapon = GetComponentInChildren<Weapon_Axe>().gameObject;
-    }
-
     protected override void Start()
     {
         base.Start();
@@ -26,7 +18,6 @@ public class Goblin_Boss : Monster_Goblin
         {
             anim.SetTrigger("Attack");
             int randomAttack = Random.Range(0, 10);
-            //Debug.Log($"{randomAttack}");
             switch (randomAttack)
             {
                 case 0:
@@ -53,7 +44,6 @@ public class Goblin_Boss : Monster_Goblin
     void AttackPatternA()
     {
         anim.SetInteger("AttackType", 0);
-        //Attack(attackTarget);
         attackCoolTime = attackSpeed;
         return;
     }
@@ -61,7 +51,6 @@ public class Goblin_Boss : Monster_Goblin
     void AttackPatternB()
     {
         anim.SetInteger("AttackType", 1);
-        //Attack(attackTarget);
         attackCoolTime = attackSpeed;
         return;
     }
@@ -69,7 +58,6 @@ public class Goblin_Boss : Monster_Goblin
     void AttackPatternC()
     {
         anim.SetInteger("AttackType", 2);
-        //Attack(attackTarget);
         attackCoolTime = attackSpeed;
         return;
     }
@@ -81,7 +69,7 @@ public class Goblin_Boss : Monster_Goblin
             ChangeState(MonsterState.Dead);
             
         }
-        GameManager.Instance.MissionCount++;
+        GameManager.Instance.MissionCount++;    // 보스 사망시 미션 카운트 올려주기
     }
 
 }

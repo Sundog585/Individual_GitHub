@@ -9,22 +9,19 @@ public class Goblin_Group : MonoBehaviour
 
     private void Start()
     {
-        //int childCount = transform.childCount;
-        //for (int i = 0; i < childCount; i++)
-        //{
-        //}
         goblins = GetComponentsInChildren<Monster_Goblin>();
     }
 
     public void GroupChase()
     {
+        // 
         foreach (Monster_Goblin child in goblins)
         {
             if (child.name == transform.name)
-                return;
-            child.ChangeState(MonsterState.Chase);
-            transform.DetachChildren();
-            Destroy(this.gameObject,0.5f);
+                return; // 자신은 리턴
+            child.ChangeState(MonsterState.Chase); // 몬스터들 상태 변경
         }
+        transform.DetachChildren(); // 자식들 분리
+        Destroy(this.gameObject,0.5f);
     }
 }

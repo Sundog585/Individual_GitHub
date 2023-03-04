@@ -51,14 +51,15 @@ public class Monster_Goblin : MonoBehaviour, IHit
     public Action<float> onHealthChange { get ; set ; }
     public Action onDead { get ; set; }
 
-    // 공격용
+    // 전투용
     public float attackPower = 10.0f;
     public float defencePower = 5.0f;
     public float attackSpeed = 1.0f;
-    public float attackCoolTime = 3.0f;
+    public float attackCoolTime = 0;
 
+    // 각종 클래스들
     protected GameObject player;
-    public Transform target;
+    public Transform target;    // Nav의 목표
     protected PlayerTank playerTank;
     protected Goblin_Group group;
 
@@ -77,7 +78,6 @@ public class Monster_Goblin : MonoBehaviour, IHit
 
     protected virtual void Start()
     {
-        // 나중에 아군 탱크 어떻게 쫒을건지 생각해 보기
         player = GameManager.Instance.Player;
         target = player.transform;
         playerTank = player.GetComponent<PlayerTank>();
@@ -202,9 +202,10 @@ public class Monster_Goblin : MonoBehaviour, IHit
         if (attackCoolTime < 0.0f)
         {
             transform.rotation = Quaternion.Slerp(transform.rotation,
-                Quaternion.LookRotation(target.transform.position - transform.position), 0.1f);
+                Quaternion.LookRotation(target.transform.position - transform.position), 0.1f); // 플레이어 바라보기
             anim.SetTrigger("Attack");
             isAttack = true;
+            attackCoolTime = attackSpeed;   // 쿨타임 초기화 해주기
         }
     }
 
@@ -258,7 +259,6 @@ public class Monster_Goblin : MonoBehaviour, IHit
         if (HP > 0.0f)
         {
             anim.SetTrigger("TakeDamage");
-            attackCoolTime = attackSpeed;
             if (!isAttack)
             {
                 ChangeState(MonsterState.Chase);
