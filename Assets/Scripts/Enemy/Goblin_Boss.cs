@@ -73,4 +73,15 @@ public class Goblin_Boss : Monster_Goblin
         attackCoolTime = attackSpeed;
         return;
     }
+
+    protected override void Die()
+    {
+        if (!isDead)
+        {
+            ChangeState(MonsterState.Dead);
+            
+        }
+        GameManager.Instance.MissionCount++;
+    }
+
 }

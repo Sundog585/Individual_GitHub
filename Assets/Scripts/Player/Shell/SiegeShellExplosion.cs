@@ -20,10 +20,11 @@ public class SiegeShellExplosion : MonoBehaviour
                 //    target.HP -= damage;
                 //}
                 // 고블린이 죽고 나서도 이팩트에 들어오는거 같음
-                Destroy(this.gameObject, 3.0f);
+                Destroy(this.gameObject, 1.0f);
             }
         }
     }
+
     //private void OnTriggerExit(Collider other)
     //{
     //    if (!other.CompareTag("Player"))    // 플레이어가 아닌 대상이 나갔을 경우

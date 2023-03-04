@@ -276,7 +276,7 @@ public class Monster_Goblin : MonoBehaviour, IHit
         }
     }
 
-    private void Die()
+    protected virtual void Die()
     {
         if (!isDead)
         {

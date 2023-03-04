@@ -23,7 +23,8 @@ public class Goblin_Group : MonoBehaviour
             if (child.name == transform.name)
                 return;
             child.ChangeState(MonsterState.Chase);
-            
+            transform.DetachChildren();
+            Destroy(this.gameObject,0.5f);
         }
     }
 }

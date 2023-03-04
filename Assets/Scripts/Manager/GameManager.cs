@@ -6,6 +6,8 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+    int missionCount = 0;
+
     private static GameManager instance;
 
     /// <summary>
@@ -48,22 +50,41 @@ public class GameManager : MonoBehaviour
     {
         get { return store; }
     }
+    
+    public int MissionCount
+    {
+        get => missionCount;
+        set
+        {
+            if (value != missionCount)
+            {
+                missionCount = value;
+                if(missionCount == 3)
+                {
+                    SceneManager.LoadScene("GameClearScene");
+                }
+            }
+        }
+    }
 
     private void Awake()
     {
-        if (instance == null)
-        {
-            instance = this;
-            DontDestroyOnLoad(gameObject);
-            SceneManager.sceneLoaded += OnSceneLoaded;
-        }
-        else
-        {
-            if (instance != this)
-            {
-                Destroy(gameObject);
-            }
-        }
+        instance = this;
+        //DontDestroyOnLoad(gameObject);
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        //if (instance == null)
+        //{
+        //    instance = this;
+        //    DontDestroyOnLoad(gameObject);
+        //    SceneManager.sceneLoaded += OnSceneLoaded;
+        //}
+        //else
+        //{
+        //    if (instance != this)
+        //    {
+        //        Destroy(gameObject);
+        //    }
+        //}
     }
 
     private void OnSceneLoaded(Scene sceneData, LoadSceneMode mode)
@@ -72,9 +93,14 @@ public class GameManager : MonoBehaviour
         Initialize();
     }
 
+    public void GameOver()
+    {
+        SceneManager.LoadScene("GameOverScene");
+    }
+
     public void Initialize()
     {
-        Cursor.visible = false;
+        //Cursor.visible = false;
         player = GameObject.FindGameObjectWithTag("Player");    //mapManager의 초기화보다 앞에 있어야 한다.
         store = GameObject.FindGameObjectWithTag("Store");
         playerUI = GameObject.FindGameObjectWithTag("PlayerUI");
@@ -83,5 +109,6 @@ public class GameManager : MonoBehaviour
             mapManager = GetComponent<MapManager>();
         }
         mapManager.Initialize();
+        missionCount = 0;
     }
 }

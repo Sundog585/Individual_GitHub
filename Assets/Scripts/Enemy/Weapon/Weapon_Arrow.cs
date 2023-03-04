@@ -29,8 +29,9 @@ public class Weapon_Arrow : MonoBehaviour
             {
                 hitTarget.TakeDamage(arrowDamage);
             }
+            Destroy(this.gameObject);
 
-            Destroy(this.gameObject);   // Æ÷Åº »èÁ¦
         }
+        Destroy(this.gameObject, 1.5f);   // Æ÷Åº »èÁ¦
     }
 }

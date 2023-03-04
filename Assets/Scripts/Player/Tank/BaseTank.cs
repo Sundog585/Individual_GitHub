@@ -99,6 +99,7 @@ public class BaseTank : MonoBehaviour, IHit
     {
         isDead = true;
         HP = 0;
+        GameManager.Instance.GameOver();
         DestroyProcess(); 
     }
 
